@@ -1,0 +1,999 @@
+<title>RidePair Engineering Brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+/* ─────────────────────────── tokens ─────────────────────────── */
+:root{
+  --ground:#f6f8f5;
+  --surface:#ffffff;
+  --surface-2:#eef2ec;
+  --ink:#111815;
+  --ink-2:#3f4c46;
+  --ink-3:#6a7a72;
+  --rule:#d9e2da;
+  --rule-2:#c3d0c5;
+
+  --emerald:#046a4a;
+  --emerald-soft:#e2f1e9;
+  --indigo:#4038c9;
+  --indigo-soft:#e6e4fb;
+  --amber:#8a5200;
+  --amber-soft:#fbeed6;
+  --rose:#9b2033;
+  --rose-soft:#fbe3e5;
+
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,monospace;
+
+  --measure:68ch;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d1310;
+    --surface:#141c18;
+    --surface-2:#1b2520;
+    --ink:#e7eee9;
+    --ink-2:#b4c2ba;
+    --ink-3:#83938b;
+    --rule:#26332c;
+    --rule-2:#33443a;
+
+    --emerald:#5cc79b;
+    --emerald-soft:#122a20;
+    --indigo:#a49dff;
+    --indigo-soft:#1d1b3a;
+    --amber:#e0a33f;
+    --amber-soft:#2c2110;
+    --rose:#f08a96;
+    --rose-soft:#33161b;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d1310;
+  --surface:#141c18;
+  --surface-2:#1b2520;
+  --ink:#e7eee9;
+  --ink-2:#b4c2ba;
+  --ink-3:#83938b;
+  --rule:#26332c;
+  --rule-2:#33443a;
+
+  --emerald:#5cc79b;
+  --emerald-soft:#122a20;
+  --indigo:#a49dff;
+  --indigo-soft:#1d1b3a;
+  --amber:#e0a33f;
+  --amber-soft:#2c2110;
+  --rose:#f08a96;
+  --rose-soft:#33161b;
+}
+
+/* ─────────────────────────── base ─────────────────────────── */
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.62;
+  margin:0;
+  padding-inline:20px;
+  padding-block:0;
+}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.18}
+p{margin:0}
+a{color:var(--emerald)}
+
+code,.mono{font-family:var(--mono);font-size:.83em;font-variant-ligatures:none}
+
+/* file / endpoint reference chips */
+.ref{
+  font-family:var(--mono);font-size:.78em;
+  background:var(--emerald-soft);color:var(--emerald);
+  padding:.12em .42em;border-radius:3px;
+  white-space:nowrap;
+}
+.ref-fe{background:var(--indigo-soft);color:var(--indigo)}
+
+/* ─────────────────────────── shell ─────────────────────────── */
+.shell{max-width:1180px;margin-inline:auto;padding-block:0 96px}
+
+.masthead{
+  border-bottom:2px solid var(--ink);
+  padding-block:56px 22px;
+  margin-bottom:0;
+}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.masthead h1{
+  font-size:clamp(2.4rem,6.4vw,4rem);font-weight:700;letter-spacing:-.03em;
+  margin-top:14px;
+}
+.masthead .standfirst{
+  font-size:1.12rem;color:var(--ink-2);max-width:58ch;margin-top:16px;
+}
+.masthead .facts{
+  display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:26px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-3);
+}
+.masthead .facts b{color:var(--ink);font-weight:500}
+
+.layout{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:1000px){
+  .layout{grid-template-columns:210px minmax(0,1fr);gap:52px;align-items:start}
+}
+
+/* contents rail */
+.toc{padding-block:32px;border-bottom:1px solid var(--rule)}
+@media(min-width:1000px){
+  .toc{position:sticky;top:0;max-height:100vh;overflow-y:auto;border-bottom:0;padding-block:40px}
+}
+.toc h2{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.toc ol{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.toc a{
+  display:block;text-decoration:none;color:var(--ink-2);
+  font-family:var(--display);font-size:13.5px;line-height:1.35;
+  padding:5px 0 5px 12px;border-left:2px solid var(--rule);
+}
+.toc a:hover{color:var(--emerald);border-left-color:var(--emerald)}
+.toc a:focus-visible{outline:2px solid var(--emerald);outline-offset:2px}
+
+main{min-width:0;padding-block:40px 0}
+
+/* ─────────────────────────── sections ─────────────────────────── */
+section{padding-block:44px;border-top:1px solid var(--rule)}
+section:first-child{border-top:0;padding-top:8px}
+.sec-no{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  color:var(--ink-3);text-transform:uppercase;
+}
+section>h2{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:600;letter-spacing:-.02em;margin-top:8px}
+section>.lede{font-size:1.04rem;color:var(--ink-2);max-width:var(--measure);margin-top:12px}
+
+h3{font-size:1.16rem;font-weight:600;margin-top:36px;letter-spacing:-.01em}
+h4{font-size:.96rem;font-weight:600;margin-top:24px}
+section p{max-width:var(--measure);margin-top:12px}
+section ul{max-width:var(--measure);margin:12px 0 0;padding-left:20px}
+section li{margin-top:7px}
+
+.tier{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:.2em .5em;border-radius:3px;vertical-align:2px;
+}
+.t-fe{background:var(--indigo-soft);color:var(--indigo)}
+.t-be{background:var(--emerald-soft);color:var(--emerald)}
+.t-db{background:var(--amber-soft);color:var(--amber)}
+
+/* plain definition rows — not cards */
+.rows{margin-top:18px;border-top:1px solid var(--rule)}
+.row{
+  display:grid;grid-template-columns:1fr;gap:2px 22px;
+  padding-block:14px;border-bottom:1px solid var(--rule);
+}
+@media(min-width:720px){.row{grid-template-columns:210px minmax(0,1fr)}}
+.row dt{font-family:var(--mono);font-size:12.5px;color:var(--emerald);line-height:1.5;padding-top:3px}
+.row dd{margin:0;color:var(--ink-2);font-size:.97rem}
+.row dd b{color:var(--ink);font-weight:600}
+
+/* code */
+pre{
+  margin:18px 0 0;padding:16px 18px;overflow-x:auto;
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--emerald);
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);
+}
+pre b{color:var(--emerald);font-weight:500}
+pre i{color:var(--ink-3);font-style:normal}
+.cap{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:8px}
+
+/* tables */
+.tw{overflow-x:auto;margin-top:20px;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:.9rem}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;background:var(--surface-2);
+}
+td:first-child{font-family:var(--mono);font-size:12px;color:var(--emerald);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td b{font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+
+/* the request flow — genuinely a sequence, so numbered */
+.flow{margin-top:24px;counter-reset:step;max-width:var(--measure)}
+.step{
+  position:relative;padding:0 0 22px 46px;counter-increment:step;
+  border-left:2px solid var(--rule);
+}
+.step:last-child{border-left-color:transparent;padding-bottom:0}
+.step::before{
+  content:counter(step);position:absolute;left:-15px;top:-2px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--ground);border:2px solid var(--emerald);color:var(--emerald);
+  font-family:var(--mono);font-size:12px;display:grid;place-items:center;
+}
+.step h4{margin:0 0 4px;font-size:.98rem}
+.step p{margin-top:0;font-size:.94rem;color:var(--ink-2)}
+
+/* callouts, used sparingly */
+.note{
+  margin-top:22px;padding:16px 18px;max-width:var(--measure);
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--indigo);
+}
+.note.warn{border-left-color:var(--amber)}
+.note.weak{border-left-color:var(--rose)}
+.note h4{margin:0 0 6px;font-size:.9rem;font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.note p{margin-top:0;font-size:.95rem}
+
+/* three-tier explanation ladder */
+.ladder{margin-top:20px;max-width:var(--measure)}
+.rung{padding:14px 0;border-top:1px solid var(--rule)}
+.rung:first-child{border-top:0;padding-top:0}
+.rung span{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);display:block;margin-bottom:5px;
+}
+.rung p{margin-top:0;font-size:.96rem}
+
+/* the ten */
+.ten{list-style:none;margin:28px 0 0;padding:0;counter-reset:ten}
+.ten li{
+  counter-increment:ten;position:relative;
+  padding:20px 0 20px 58px;border-top:1px solid var(--rule-2);max-width:var(--measure);
+}
+.ten li::before{
+  content:counter(ten,decimal-leading-zero);position:absolute;left:0;top:20px;
+  font-family:var(--mono);font-size:20px;color:var(--emerald);font-weight:700;
+}
+.ten h3{margin:0 0 6px;font-size:1.04rem}
+.ten p{margin-top:0;font-size:.95rem;color:var(--ink-2)}
+.ten .say{
+  margin-top:10px;padding-left:14px;border-left:2px solid var(--rule-2);
+  font-style:italic;color:var(--ink);font-size:.95rem;
+}
+
+footer{
+  border-top:2px solid var(--ink);margin-top:64px;padding-top:20px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:6px 24px;
+}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">Engineering brief · Technical complexity &amp; execution</div>
+    <h1>RidePair, end to end</h1>
+    <p class="standfirst">
+      Everything your codebase actually does — the request path, the matching algorithm, the
+      database, and the exact files that talk to each other — written so you can explain it
+      out loud rather than recite it.
+    </p>
+    <div class="facts">
+      <span><b>FastAPI</b> + SQLAlchemy + SQLite</span>
+      <span><b>React 19</b> + Vite + Tailwind 4</span>
+      <span><b>10</b> REST endpoints</span>
+      <span><b>3</b> tables</span>
+      <span><b>5</b> scoring components</span>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <nav class="toc" aria-label="Contents">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#arch">1 · Architecture</a></li>
+        <li><a href="#roundtrip">2 · The round trip</a></li>
+        <li><a href="#backend">3 · Backend, file by file</a></li>
+        <li><a href="#endpoints">4 · Every endpoint</a></li>
+        <li><a href="#auth">5 · Auth &amp; authorization</a></li>
+        <li><a href="#db">6 · The database</a></li>
+        <li><a href="#algo">7 · The matching algorithm</a></li>
+        <li><a href="#bridge">8 · Frontend ↔ backend</a></li>
+        <li><a href="#traces">9 · Two complete traces</a></li>
+        <li><a href="#concepts">10 · Concepts you can claim</a></li>
+        <li><a href="#judges">11 · The judge's view</a></li>
+        <li><a href="#ten">12 · The ten things</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- ══════════════ 1 ══════════════ -->
+      <section id="arch">
+        <div class="sec-no">Section one</div>
+        <h2>Overall architecture</h2>
+        <p class="lede">
+          Three layers, one job each. The browser draws things and collects clicks. The Python
+          server decides what is allowed and does the thinking. SQLite remembers.
+        </p>
+
+        <h3>What's actually installed</h3>
+        <div class="rows">
+          <div class="row"><dt>FastAPI</dt><dd>The Python web framework. It receives HTTP requests, checks the incoming JSON is the right shape, and returns JSON back. It also auto-generates the interactive docs page at <span class="ref">/docs</span>.</dd></div>
+          <div class="row"><dt>SQLAlchemy 2.0</dt><dd>The ORM — the translator between Python objects and SQL rows. You write <code>db.query(Ride)</code>; it writes the <code>SELECT</code>.</dd></div>
+          <div class="row"><dt>SQLite</dt><dd>The database. One file on disk: <span class="ref">ridepair.db</span>. No separate server process to install or run.</dd></div>
+          <div class="row"><dt>Pydantic</dt><dd>Validation. Every request body and response is described as a class in <span class="ref">backend/schemas.py</span>, and FastAPI enforces it automatically.</dd></div>
+          <div class="row"><dt>PyJWT</dt><dd>Creates and verifies the signed login tokens.</dd></div>
+          <div class="row"><dt>React 19 + Vite</dt><dd>The frontend. Vite is the dev server and the build tool.</dd></div>
+          <div class="row"><dt>React Router 7</dt><dd>Client-side routing — the URL changes without the page reloading.</dd></div>
+          <div class="row"><dt>Tailwind 4</dt><dd>Styling, with the design tokens defined in <span class="ref-fe">src/index.css</span>.</dd></div>
+        </div>
+
+        <h3>Two ways it runs</h3>
+        <p>
+          <b>In development</b> there are two processes. React runs on port 5173, FastAPI on 8000.
+          The Vite config forwards anything starting with <code>/api</code> across to the backend:
+        </p>
+<pre><i>// frontend/vite.config.js</i>
+server: {
+  proxy: { <b>'/api'</b>: { target: <b>'http://127.0.0.1:8000'</b>, changeOrigin: true } },
+}</pre>
+        <p>
+          <b>In production</b> there is only one process. <code>npm run build</code> compiles React
+          into <span class="ref">static_react/</span>, and FastAPI serves those files itself
+          (<span class="ref">backend/main.py:91</span>).
+        </p>
+
+        <div class="note">
+          <h4>Why this matters</h4>
+          <p>
+            Because the proxy makes API calls look like they come from the same origin, the browser
+            never treats them as cross-origin — so <b>CORS never causes a problem</b>. There
+            <em>is</em> CORS middleware in <span class="ref">backend/main.py</span>, but it's a
+            safety net, not the thing making it work. That's a good, honest answer if a judge asks.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════ 2 ══════════════ -->
+      <section id="roundtrip">
+        <div class="sec-no">Section two</div>
+        <h2>What happens on every single action</h2>
+        <p class="lede">
+          This exact sequence runs for every button in the app. Learn it once and you can narrate
+          any feature.
+        </p>
+
+        <div class="flow">
+          <div class="step">
+            <h4><span class="tier t-fe">Frontend</span> &nbsp;A component calls the API layer</h4>
+            <p>A page like <span class="ref-fe">pages/FindRides.jsx</span> calls <code>api.match(query)</code>. Pages never call <code>fetch</code> themselves.</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-fe">Frontend</span> &nbsp;One function builds the request</h4>
+            <p><code>request()</code> in <span class="ref-fe">src/lib/api.js:45</span> sets <code>Content-Type: application/json</code>, attaches the login token as <code>Authorization: Bearer …</code>, and converts the JavaScript object to a JSON string.</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-be">Backend</span> &nbsp;FastAPI validates before your code runs</h4>
+            <p>The JSON is checked against a Pydantic class in <span class="ref">schemas.py</span>. Wrong type or missing field → automatic <code>422</code>, and the route function is never entered.</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-be">Backend</span> &nbsp;It works out who is asking</h4>
+            <p><code>get_current_user</code> (<span class="ref">backend/auth.py:64</span>) decodes the token signature and loads that User. No valid token → <code>401</code>.</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-db">Database</span> &nbsp;SQLAlchemy runs the SQL</h4>
+            <p>The route reads or writes rows through a session handed to it by <code>get_db()</code> (<span class="ref">backend/database.py:22</span>).</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-be">Backend</span> &nbsp;Rows become JSON</h4>
+            <p><code>serialize_ride()</code> (<span class="ref">rides.py:56</span>) converts a database row into the exact shape declared in <code>response_model</code>, deciding en route what this particular viewer is allowed to see.</p>
+          </div>
+          <div class="step">
+            <h4><span class="tier t-fe">Frontend</span> &nbsp;React re-renders</h4>
+            <p>The awaited promise resolves, the page calls <code>setState</code>, and React redraws only what changed.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════ 3 ══════════════ -->
+      <section id="backend">
+        <div class="sec-no">Section three</div>
+        <h2>The backend, file by file</h2>
+        <p class="lede">
+          Eight files, each with one job. If something breaks you know which one to open — that
+          separation is itself worth saying out loud.
+        </p>
+
+        <div class="rows">
+          <div class="row">
+            <dt>config.py</dt>
+            <dd><b>All the knobs in one place.</b> College email domain, college name, the nine transit hubs with their fares and travel times, campus pickup points, vehicle types, luggage options, and the five scoring weights. Nothing else in the codebase hard-codes a hub or a fare.</dd>
+          </div>
+          <div class="row">
+            <dt>database.py</dt>
+            <dd>Creates the SQLAlchemy engine and session factory. <code>get_db()</code> (line 22) hands a session to a route and <b>always closes it</b>, even if the route raises. <code>init_db()</code> (line 32) creates any missing tables at startup.</dd>
+          </div>
+          <div class="row">
+            <dt>models.py</dt>
+            <dd>The three tables as Python classes: <code>User</code> (line 29), <code>Ride</code> (line 64), <code>RideJoin</code> (line 136). Also two computed properties — <code>riders_count</code> (line 121) and <code>seats_filled_pct</code> — which are derived on the fly rather than stored, so they can never go stale.</dd>
+          </div>
+          <div class="row">
+            <dt>schemas.py</dt>
+            <dd>Thirteen Pydantic classes defining every request and response shape. This is your <b>API contract</b> and your first line of validation.</dd>
+          </div>
+          <div class="row">
+            <dt>auth.py</dt>
+            <dd>Password hashing (line 30), password checking (line 40), token creation (line 55), the "who is asking" dependency (line 64), and the college-email gate (line 94).</dd>
+          </div>
+          <div class="row">
+            <dt>matching.py</dt>
+            <dd><b>The algorithm.</b> 299 lines, no HTTP anywhere in it — pure logic, which is why it's testable on its own. Five scoring functions, a match classifier, a scorer, and <code>find_matches()</code>.</dd>
+          </div>
+          <div class="row">
+            <dt>routers/users.py</dt>
+            <dd>Three endpoints: signup, login, me.</dd>
+          </div>
+          <div class="row">
+            <dt>routers/rides.py</dt>
+            <dd>Six endpoints plus the serialisation helpers. The biggest file at 407 lines.</dd>
+          </div>
+          <div class="row">
+            <dt>main.py</dt>
+            <dd>Assembles everything: creates the app, adds CORS, registers both routers, exposes <code>/api/health</code> and <code>/api/meta</code>, and serves the built React app for every non-API URL.</dd>
+          </div>
+        </div>
+
+        <h3>Why it's split this way</h3>
+        <p>
+          The rule is <b>one reason to change per file</b>. Adding a transit hub touches only
+          <code>config.py</code>. Changing how matches rank touches only <code>matching.py</code>.
+          Adding a field touches <code>models.py</code> and <code>schemas.py</code>. Nothing
+          about HTTP leaks into the algorithm, and no SQL is written inside a route by hand.
+        </p>
+      </section>
+
+      <!-- ══════════════ 4 ══════════════ -->
+      <section id="endpoints">
+        <div class="sec-no">Section four</div>
+        <h2>Every endpoint</h2>
+        <p class="lede">
+          Ten REST endpoints. Nouns in the URL, verbs as HTTP methods, proper status codes — that
+          is what makes it REST rather than just "some URLs".
+        </p>
+
+        <div class="tw">
+          <table>
+            <thead>
+              <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>What it does</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>/api/health</td><td>GET</td><td>no</td><td>Is the server alive.</td></tr>
+              <tr><td>/api/meta</td><td>GET</td><td>no</td><td>Hubs, pickup points, vehicle and luggage options, scoring weights. <b>Every dropdown in the app is built from this</b>, so adding a hub needs no frontend change.</td></tr>
+              <tr><td>/api/auth/signup</td><td>POST</td><td>no</td><td>Register. Enforces the college domain, hashes the password, returns a token. <b>201</b>.</td></tr>
+              <tr><td>/api/auth/login</td><td>POST</td><td>no</td><td>Verify password, return token + user.</td></tr>
+              <tr><td>/api/auth/me</td><td>GET</td><td><b>yes</b></td><td>Who is this token. Used on page load to confirm a stored session is still valid.</td></tr>
+              <tr><td>/api/rides</td><td>POST</td><td><b>yes</b></td><td>Create a ride — either an offer or a seek. <b>201</b>.</td></tr>
+              <tr><td>/api/rides/match</td><td>POST</td><td><b>yes</b></td><td><b>The core.</b> Returns scored, ranked matches with a score breakdown.</td></tr>
+              <tr><td>/api/rides/dashboard</td><td>GET</td><td><b>yes</b></td><td>Upcoming vs past trips, money saved, CO₂, rating.</td></tr>
+              <tr><td>/api/rides/campus-stats</td><td>GET</td><td>no</td><td>Public landing-page figures and per-hub activity.</td></tr>
+              <tr><td>/api/rides/{id}/join</td><td>POST</td><td><b>yes</b></td><td>Take a seat. Six guards, then one transaction.</td></tr>
+              <tr><td>/api/rides/{id}</td><td>GET</td><td><b>yes</b></td><td>Full detail for one ride.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <h4>A detail worth mentioning unprompted</h4>
+          <p>
+            <code>/dashboard</code> and <code>/campus-stats</code> are declared <em>before</em>
+            <code>/{ride_id}</code> in <span class="ref">rides.py</span>. FastAPI matches routes
+            top-down, so if they came second the server would try to read "dashboard" as a ride ID
+            and fail. Small thing, real bug avoided.
+          </p>
+        </div>
+
+        <h3>The shape of the important one</h3>
+        <p>You send this to <code>POST /api/rides/match</code>:</p>
+<pre>{
+  "ride_type": <b>"seek"</b>,          <i>// what YOU are doing</i>
+  "from_location": "Uni Mall / Main Gate",
+  "to_location": "Jalandhar City Railway Station",
+  "ride_date": "2026-09-12",
+  "depart_time": "17:20",
+  "time_flex": 30,             <i>// how flexible you are, in minutes</i>
+  "group_size": 1,
+  "luggage": "carryon"
+}</pre>
+        <p>And you get back a ranked array, each item carrying not just the ride but the reasoning:</p>
+<pre>[{
+  "score": <b>92</b>,
+  "match_kind": <b>"group_up"</b>,
+  "headline": "Group up with Aman",
+  "time_gap_minutes": 5,
+  "your_share": 350,
+  "you_save": 350,
+  "save_pct": 50,
+  "reasons": ["5 min after your time", "Same hub and terminal", …],
+  "breakdown": { "time": 40.0, "destination": 20.0, "pickup": 15.0,
+                 "seats": 12.0, "luggage": 8.0 },
+  "ride": { …the full ride object… }
+}]</pre>
+        <p>
+          That <code>breakdown</code> field is the one to point at on stage. It's what lets the UI
+          show <em>why</em> a match ranked where it did, and it proves the number isn't decorative.
+        </p>
+      </section>
+
+      <!-- ══════════════ 5 ══════════════ -->
+      <section id="auth">
+        <div class="sec-no">Section five</div>
+        <h2>Authentication and authorization</h2>
+        <p class="lede">
+          Two different questions. <b>Authentication</b> is "who are you". <b>Authorization</b> is
+          "are you allowed to do this". Your code handles both, in different places.
+        </p>
+
+        <h3>Passwords are never stored</h3>
+        <p>
+          <code>hash_password()</code> (<span class="ref">auth.py:30</span>) generates 16 random
+          bytes of salt, then runs PBKDF2-SHA256 over the password <b>120,000 times</b>. What goes
+          in the database is <code>salt$hash</code> — about 97 characters. The original password
+          exists nowhere.
+        </p>
+        <p>
+          The random salt means two students with the same password still get completely different
+          stored values, so an attacker can't spot repeats. Checking a password
+          (<code>verify_password</code>, line 40) re-runs the same computation and compares with
+          <code>hmac.compare_digest</code>, which takes the same amount of time whether the first
+          character is wrong or the last — that closes a timing side-channel.
+        </p>
+
+        <h3>Tokens</h3>
+        <p>
+          On successful login, <code>create_token()</code> (line 55) builds a JWT containing the
+          user id, email and an expiry 72 hours out, signed with the server's secret. The browser
+          stores it and sends it on every later request.
+        </p>
+        <p>
+          <b>The token is signed, not encrypted.</b> Anyone can read its contents; nobody can change
+          them without invalidating the signature. That's the property that matters.
+        </p>
+
+        <h3>The security rule that matters most</h3>
+        <p>
+          When you create a ride, the browser sends the destination, time and seats — but
+          <b>never who you are</b>. The creator comes from the token:
+        </p>
+<pre><i># backend/routers/rides.py:135</i>
+ride = Ride(
+    user_id=<b>user.id</b>,   <i># from the verified token, NOT from the request body</i>
+    ...
+)</pre>
+        <p>
+          If it came from the request body, anyone could post a ride in someone else's name by
+          editing the JSON. This is the single most important line to be able to defend.
+        </p>
+
+        <h3>Authorization — four separate rules</h3>
+        <ul>
+          <li><b>Only verified students exist.</b> <code>check_college_email()</code> (line 94) rejects any address outside the allowed domain at signup.</li>
+          <li><b>Contact details are earned.</b> <code>_rider_out()</code> (<span class="ref">rides.py:40</span>) includes a phone number <em>only</em> if the viewer is on that ride <b>and</b> that person left sharing enabled. Everyone else literally receives <code>null</code> — the data never leaves the server.</li>
+          <li><b>Same-gender-only rides are invisible.</b> Filtered out in <code>find_matches</code>, and independently rejected at <code>join_ride</code> with a <code>403</code>.</li>
+          <li><b>You can't act on your own ride.</b> Checked both in matching and in join.</li>
+        </ul>
+
+        <div class="note">
+          <h4>Say this if asked about security</h4>
+          <p>
+            "Privacy is enforced at serialisation, not in the UI. A hidden phone number isn't
+            hidden with CSS — the API sends <code>null</code>. You can open DevTools and it still
+            isn't there."
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════ 6 ══════════════ -->
+      <section id="db">
+        <div class="sec-no">Section six</div>
+        <h2>The database</h2>
+        <p class="lede">
+          SQLite — a single file, <span class="ref">ridepair.db</span>. Three tables. The design
+          decision worth defending is the third one.
+        </p>
+
+        <h3>users</h3>
+        <p>
+          Identity and trust: <code>id</code>, <code>name</code>, <code>email</code> (unique,
+          indexed), <code>password_hash</code>, <code>college</code>, <code>phone</code>,
+          <code>gender</code>, plus the campus identity the UI shows — <code>class_year</code>,
+          <code>major</code>, <code>dorm</code> — and trust signals <code>rating</code>,
+          <code>rides_hosted</code>, <code>reviews_count</code>, and the privacy flag
+          <code>share_contact_on_match</code>.
+        </p>
+
+        <h3>rides</h3>
+        <p>
+          One table serving <b>both</b> "I'm offering seats" and "I need a ride", separated by the
+          <code>ride_type</code> column. Alongside route and timing it stores
+          <code>hub_category</code>, <code>time_flex</code>, <code>seats_available</code>,
+          <code>fare_total</code>, <code>fare_per_seat</code>, <code>luggage</code>,
+          <code>gender_only</code> and <code>status</code>.
+        </p>
+        <p>
+          Two storage choices are worth calling out. Departure time is stored
+          <b>twice</b>: <code>depart_time</code> as <code>"17:00"</code> for display, and
+          <code>depart_minutes</code> as the integer <code>1020</code> for arithmetic. "Within 45
+          minutes" becomes <code>abs(a − b) &lt;= 45</code> — plain integer maths instead of
+          parsing timestamps. And the index is built to match the query that actually runs:
+        </p>
+<pre><i># backend/models.py:115</i>
+__table_args__ = (
+    Index("ix_rides_match", <b>"ride_date", "status", "depart_minutes"</b>),
+    Index("ix_rides_hub", "to_location", "ride_date"),
+)</pre>
+
+        <h3>ride_joins</h3>
+        <p>
+          The one to defend. It holds only <code>ride_id</code>, <code>user_id</code> and
+          <code>joined_at</code>, with a <b>unique constraint on the pair</b>.
+        </p>
+        <p>
+          A beginner would put a <code>passengers</code> column on <code>rides</code>. That breaks
+          immediately: one ride has many passengers, and one student joins many rides. A separate
+          join table models a genuine many-to-many relationship — and the unique constraint means
+          the <em>database itself</em> makes double-joining impossible, even if the API check were
+          somehow bypassed.
+        </p>
+
+        <h3>What the database actually does, per action</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Action</th><th>SQL that runs</th></tr></thead>
+            <tbody>
+              <tr><td>Register</td><td><code>INSERT</code> one row into <code>users</code>. Unique index on email rejects duplicates.</td></tr>
+              <tr><td>Log in</td><td><code>SELECT</code> by email, then hash comparison in Python. No write.</td></tr>
+              <tr><td>Post a ride</td><td><code>INSERT</code> into <code>rides</code>, then an <code>UPDATE</code> to set the display code and increment the host's <code>rides_hosted</code>.</td></tr>
+              <tr><td>Search</td><td><b>Reads only.</b> One indexed <code>SELECT</code> plus two eager-load queries. Nothing is written — searching leaves no trace.</td></tr>
+              <tr><td>Join</td><td><code>INSERT</code> into <code>ride_joins</code> and <code>UPDATE</code> the seat count, <b>in one transaction</b>.</td></tr>
+              <tr><td>Dashboard</td><td>Two <code>SELECT</code>s with eager loading, then totals computed in Python.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note warn">
+          <h4>Honest gap</h4>
+          <p>
+            There is no <b>U</b>pdate or <b>D</b>elete for rides — you can't edit or cancel one
+            yet. Create, Read and the join-write exist; the other two were cut for scope. Say that
+            plainly if asked; it's a scope decision, not an oversight.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════ 7 ══════════════ -->
+      <section id="algo">
+        <div class="sec-no">Section seven</div>
+        <h2>The matching algorithm</h2>
+        <p class="lede">
+          This is the part that separates your project from a CRUD app, so it deserves the most
+          rehearsal. Rides are not filtered into a list — every candidate is <b>scored out of 100
+          and ranked</b>.
+        </p>
+
+        <h3>One engine, three kinds of match</h3>
+        <p>
+          <code>classify()</code> (<span class="ref">matching.py:139</span>) decides what kind of
+          pairing two rides represent:
+        </p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>You</th><th>Them</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>seek</td><td>offer</td><td><b>join_car</b> — take a seat in their cab</td></tr>
+              <tr><td>seek</td><td>seek</td><td><b>group_up</b> — neither of you has a car, so split one together</td></tr>
+              <tr><td>offer</td><td>seek</td><td><b>give_seat</b> — fill your empty seat</td></tr>
+              <tr><td>offer</td><td>offer</td><td><code>None</code> — two drivers have no reason to pair</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The middle row is your differentiator. Most ride-share apps can only connect a rider to a
+          driver. Yours also connects riders <em>to each other</em>, so four students who between
+          them own no car still leave campus in one cab.
+        </p>
+
+        <h3>The formula</h3>
+<pre>score = <b>45</b> × time_proximity      <i>// how close the departures are</i>
+      + <b>20</b> × destination_match   <i>// exact hub, or shared-word fallback</i>
+      + <b>15</b> × pickup_proximity    <i>// same campus gate?</i>
+      + <b>12</b> × seat_fit            <i>// does the group physically fit?</i>
+      +  <b>8</b> × luggage_fit         <i>// room for their bags?</i>
+
+time_proximity = max(0, 1 − Δminutes / flex_window)</pre>
+        <p class="cap">Weights live in config.py and sum to exactly 100, so the score reads as a percentage.</p>
+
+        <p>Each of the five is a small function returning a number between 0 and 1:</p>
+        <div class="rows">
+          <div class="row"><dt>_time_component</dt><dd>Line 84. <b>The clever bit:</b> the window is <code>max(your flex, their flex)</code> — so if either side says "±1 hour", the match is allowed. Someone flexible genuinely sees more options.</dd></div>
+          <div class="row"><dt>_destination_component</dt><dd>Line 94. Exact match scores 1.0. Otherwise it compares word overlap, so "Amritsar Station" still partially matches "Amritsar Railway Station" — that's a fuzzy fallback, not a strict equality check.</dd></div>
+          <div class="row"><dt>_pickup_component</dt><dd>Line 106. Same gate scores 1.0; a different gate still scores <b>0.5</b>, because you're both on the same campus anyway.</dd></div>
+          <div class="row"><dt>_seat_component</dt><dd>Line 113. Different maths per match kind: a car needs free seats; a group needs the combined party to fit in one cab.</dd></div>
+          <div class="row"><dt>_luggage_component</dt><dd>Line 127. Luggage is <b>ranked</b>, not compared for equality — a ride that allows suitcases also allows backpacks, so it compares ranks.</dd></div>
+        </div>
+
+        <h3>How the search runs</h3>
+        <p><code>find_matches()</code> (<span class="ref">matching.py:235</span>) is deliberately two-phase:</p>
+        <ul>
+          <li><b>Phase one — the database does the cheap work.</b> One indexed <code>SELECT</code> narrows to the same date, still open, not your own ride, inside the widest possible time window.</li>
+          <li><b>Phase two — Python does the expensive work</b> on the handful that survived: safety filters, then scoring.</li>
+          <li>Finally <code>results.sort(key=lambda r: (-r["score"], r["time_gap_minutes"]))</code> — best score first, ties broken by whoever leaves closest to your time.</li>
+        </ul>
+        <p>
+          That ordering is the scalability argument: scoring never runs over the whole table, only
+          over what's plausibly relevant.
+        </p>
+      </section>
+
+      <!-- ══════════════ 8 ══════════════ -->
+      <section id="bridge">
+        <div class="sec-no">Section eight</div>
+        <h2>How the frontend talks to the backend</h2>
+        <p class="lede">
+          Every network call in the entire app goes through <b>one function</b>. That's the design
+          decision to lead with here.
+        </p>
+
+        <h3>The single door</h3>
+<pre><i>// frontend/src/lib/api.js:45</i>
+async function request(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' }
+  const token = getToken()
+  <b>if (token) headers.Authorization = `Bearer ${token}`</b>
+
+  res = await fetch(path, {
+    method, headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+
+  <i>// session died — bounce to login, once, centrally</i>
+  if (res.status === 401 && token) {
+    clearSession()
+    window.dispatchEvent(new CustomEvent('ridepair:logout'))
+    throw new ApiError('Your session expired. Please log in again.', 401)
+  }
+  ...
+}</pre>
+        <p>
+          Because the token is attached in exactly one place, <b>no page can ever forget it</b>.
+          Because expiry is handled in one place, every screen logs out correctly. And because
+          non-2xx responses are converted into a thrown <code>ApiError</code> with the server's own
+          message, every screen can just write <code>catch (err) → toast(err.message)</code>.
+        </p>
+
+        <p>Underneath, the endpoints are one line each — <span class="ref-fe">api.js:89–100</span>:</p>
+<pre>meta:       () =&gt; request('GET',  '/api/meta'),
+campusStats:() =&gt; request('GET',  '/api/rides/campus-stats'),
+signup:  (p) =&gt; request('POST', '/api/auth/signup', p),
+login:   (p) =&gt; request('POST', '/api/auth/login',  p),
+me:         () =&gt; request('GET',  '/api/auth/me'),
+postRide:(p) =&gt; request('POST', '/api/rides', p),
+match:   (q) =&gt; request('POST', '/api/rides/match', q),
+join: (rideId) =&gt; request('POST', `/api/rides/${rideId}/join`),
+dashboard:  () =&gt; request('GET',  '/api/rides/dashboard'),
+getRide:(rideId) =&gt; request('GET', `/api/rides/${rideId}`),</pre>
+
+        <h3>Which file calls which endpoint</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Frontend file</th><th>Line</th><th>Calls</th><th>Backend endpoint</th></tr></thead>
+            <tbody>
+              <tr><td>context/AuthContext.jsx</td><td class="num">19</td><td>api.me()</td><td>GET /api/auth/me</td></tr>
+              <tr><td>context/AuthContext.jsx</td><td class="num">39</td><td>api.login()</td><td>POST /api/auth/login</td></tr>
+              <tr><td>context/AuthContext.jsx</td><td class="num">46</td><td>api.signup()</td><td>POST /api/auth/signup</td></tr>
+              <tr><td>context/MetaContext.jsx</td><td class="num">14</td><td>api.meta()</td><td>GET /api/meta</td></tr>
+              <tr><td>pages/Landing.jsx</td><td class="num">26</td><td>api.campusStats()</td><td>GET /api/rides/campus-stats</td></tr>
+              <tr><td>pages/FindRides.jsx</td><td class="num">62</td><td>api.match()</td><td>POST /api/rides/match</td></tr>
+              <tr><td>pages/FindRides.jsx</td><td class="num">99</td><td>api.join()</td><td>POST /api/rides/{id}/join</td></tr>
+              <tr><td>pages/PostRide.jsx</td><td class="num">80</td><td>api.postRide()</td><td>POST /api/rides</td></tr>
+              <tr><td>pages/RideDetails.jsx</td><td class="num">40</td><td>api.join()</td><td>POST /api/rides/{id}/join</td></tr>
+              <tr><td>pages/Dashboard.jsx</td><td class="num">28</td><td>api.dashboard()</td><td>GET /api/rides/dashboard</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Where the login state lives</h3>
+        <p>
+          <span class="ref-fe">context/AuthContext.jsx</span> holds the current user for the whole
+          app. On first load it reads the stored user so the screen doesn't flash, then calls
+          <code>api.me()</code> to confirm the token is still genuinely valid — if not, it clears
+          the session. Protected routes in <span class="ref-fe">src/App.jsx</span> read that state
+          and redirect to <code>/auth</code> when nobody is logged in.
+        </p>
+        <div class="note warn">
+          <h4>Be precise about this one</h4>
+          <p>
+            That redirect is <b>convenience, not security</b>. The real protection is server-side:
+            every protected route declares <code>Depends(get_current_user)</code>. Even if someone
+            edited the JavaScript to show the dashboard, the API would return <code>401</code> and
+            there'd be no data to show.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════ 9 ══════════════ -->
+      <section id="traces">
+        <div class="sec-no">Section nine</div>
+        <h2>Two complete traces</h2>
+        <p class="lede">
+          Learn these two and you can answer almost any "walk me through it" question.
+        </p>
+
+        <h3>Trace A — searching for a ride</h3>
+        <div class="flow">
+          <div class="step"><h4>You submit the search form</h4><p><span class="ref-fe">FindRides.jsx</span> builds a query object and calls <code>api.match(q)</code> at line 62.</p></div>
+          <div class="step"><h4>The request goes out</h4><p><code>POST /api/rides/match</code> with a JSON body and <code>Authorization: Bearer …</code>. Skeleton loaders appear immediately.</p></div>
+          <div class="step"><h4>Pydantic validates</h4><p>The body is checked against <code>MatchQuery</code> (<span class="ref">schemas.py:121</span>). <code>depart_time</code> must match the regex <code>^\d{2}:\d{2}$</code>.</p></div>
+          <div class="step"><h4>The token is decoded</h4><p><code>get_current_user</code> turns the token into a real <code>User</code> object.</p></div>
+          <div class="step"><h4>One indexed SELECT</h4><p>Same date, status open, not your own ride, departure inside the window. <code>joinedload</code> and <code>selectinload</code> pull each ride's host and passengers in the same trip.</p></div>
+          <div class="step"><h4>Scoring in Python</h4><p>Safety filters drop gender-restricted rides; survivors are scored by the five components; anything under 35 is discarded; the rest are sorted.</p></div>
+          <div class="step"><h4>Rows become JSON</h4><p><code>serialize_ride</code> runs per match — and sets every <code>phone</code> to <code>null</code>, because you haven't joined yet.</p></div>
+          <div class="step"><h4>React renders the board</h4><p><code>setMatches(...)</code> replaces the skeletons with ranked cards, each able to show its own score breakdown.</p></div>
+        </div>
+        <p class="cap">Measured at 20,000 rides: 24 ms median, end to end over HTTP.</p>
+
+        <h3>Trace B — joining a ride</h3>
+        <div class="flow">
+          <div class="step"><h4>You press "Request to Join"</h4><p><code>join(rideId)</code> at <span class="ref-fe">FindRides.jsx:96</span> calls <code>api.join(rideId)</code>.</p></div>
+          <div class="step"><h4>POST /api/rides/{id}/join</h4><p>No body at all — the ride comes from the URL, and <b>you come from the token</b>.</p></div>
+          <div class="step"><h4>Six guards run in order</h4><p>Ride exists · not your own · still open · seats remain · gender rule satisfied · not already joined. Each failure returns a specific message, not a generic error.</p></div>
+          <div class="step"><h4>One transaction</h4><p><code>INSERT</code> the join row, decrement <code>seats_available</code>, flip status to <code>full</code> at zero, recalculate the per-head fare, then a single <code>commit()</code>. Either all of it happens or none of it does.</p></div>
+          <div class="step"><h4>Serialisation now decides differently</h4><p>Because you're on the ride, <code>_rider_out</code> now <b>includes the phone numbers</b>. Same function, different output, driven by who's asking.</p></div>
+          <div class="step"><h4>The UI updates</h4><p>A success toast fires and the card is removed from the board, because that match is no longer available to you.</p></div>
+        </div>
+<pre><i># backend/routers/rides.py:384 — the whole transaction</i>
+db.add(RideJoin(ride_id=ride.id, user_id=user.id))
+ride.seats_available -= 1
+if ride.seats_available == 0:
+    ride.status = "full"
+db.flush()
+_recalculate_fare(ride)
+<b>db.commit()</b>   <i># all of it, or none of it</i></pre>
+      </section>
+
+      <!-- ══════════════ 10 ══════════════ -->
+      <section id="concepts">
+        <div class="sec-no">Section ten</div>
+        <h2>Concepts you can genuinely claim</h2>
+        <p class="lede">
+          Every item here is actually in your code. Nothing aspirational.
+        </p>
+        <div class="rows">
+          <div class="row"><dt>REST API design</dt><dd>Ten endpoints, resource-shaped URLs, correct verbs, correct status codes (201 created, 400 bad request, 401 unauthorised, 403 forbidden, 404 missing, 422 validation).</dd></div>
+          <div class="row"><dt>Stateless JWT auth</dt><dd>Signed tokens with expiry; no server-side session store, which is exactly what lets the API scale horizontally.</dd></div>
+          <div class="row"><dt>Password security</dt><dd>PBKDF2-SHA256, 120,000 iterations, per-user random salt, constant-time comparison.</dd></div>
+          <div class="row"><dt>Authorization rules</dt><dd>Domain-restricted registration, conditional field disclosure, gender-restricted visibility enforced in two independent places.</dd></div>
+          <div class="row"><dt>Relational design</dt><dd>Three normalised tables, a proper many-to-many join table, foreign keys, a unique constraint, cascade deletes, composite indexes chosen to match the real query.</dd></div>
+          <div class="row"><dt>A ranking algorithm</dt><dd>Five weighted components summing to 100, an asymmetric flexibility window, fuzzy string matching, ranked ordering with tie-breaks — and a returned breakdown that makes it auditable.</dd></div>
+          <div class="row"><dt>Transactional integrity</dt><dd>Seat allocation as one atomic unit; a database-level unique constraint as the backstop.</dd></div>
+          <div class="row"><dt>Declarative validation</dt><dd>Pydantic schemas with type, length, range and regex rules that run before any route code.</dd></div>
+          <div class="row"><dt>Dependency injection</dt><dd>FastAPI's <code>Depends()</code> supplies the DB session and current user, so routes never manage either manually — and the session always closes.</dd></div>
+          <div class="row"><dt>Query optimisation</dt><dd>Eager loading to remove an N+1 (110 queries → 3) and aggregate SQL replacing an in-Python loop (3,813 ms → 57 ms), both measured.</dd></div>
+          <div class="row"><dt>Async request handling</dt><dd>Every frontend call is a promise with proper loading, success and error states; the UI never blocks.</dd></div>
+          <div class="row"><dt>Config-driven design</dt><dd>Hubs, fares, weights and rules live in one file; adding a destination needs zero code changes anywhere else.</dd></div>
+          <div class="row"><dt>Automated testing</dt><dd><code>npm run smoke</code> mounts all seven routes against the live API in jsdom and fails if any screen crashes or loses its content.</dd></div>
+        </div>
+      </section>
+
+      <!-- ══════════════ 11 ══════════════ -->
+      <section id="judges">
+        <div class="sec-no">Section eleven</div>
+        <h2>The judge's view</h2>
+
+        <h3>Genuinely impressive</h3>
+        <ul>
+          <li><b>The score breakdown.</b> Plenty of teams claim an algorithm; you can show the points each component contributed, live, on any card.</li>
+          <li><b>Seek-to-seek matching.</b> A real product insight, not just a feature — it serves the students who have no car at all.</li>
+          <li><b>The measured optimisation.</b> Finding your own N+1 and your own O(n) landing page, then fixing both with numbers to prove it, is senior-engineer behaviour.</li>
+          <li><b>Privacy enforced server-side.</b> Field-level disclosure based on relationship, not CSS.</li>
+          <li><b>The asymmetric time window.</b> A subtle, thoughtful rule most people wouldn't think of.</li>
+        </ul>
+
+        <h3>Honestly simple</h3>
+        <p>
+          Worth admitting freely — it builds credibility. The CRUD endpoints are standard. There's
+          no GPS, maps, payments or real-time anything. The CO₂ figure is a flat multiplier, not a
+          real emissions model. Ratings display but nothing writes to them yet. Scoring weights were
+          chosen by judgement, not trained on data.
+        </p>
+
+        <h3>What they'll probe — and your answers</h3>
+        <div class="rows">
+          <div class="row"><dt>"Why not just filter?"</dt><dd>Filtering gives a list with no order. Ranking answers "which of these is best for me" — and time proximity matters more than pickup point, which a filter can't express.</dd></div>
+          <div class="row"><dt>"Where did the weights come from?"</dt><dd>Judgement: departure time is the thing that actually makes a shared cab work. They're constants in <code>config.py</code>, so they're tunable — and with real usage data they'd be learned rather than assumed.</dd></div>
+          <div class="row"><dt>"Does it scale?"</dt><dd>Tested at 20,000 rides: 24 ms matching. Scoring runs only on candidates inside the time window, not the whole table. SQLite→Postgres is one line; auth is stateless so the API scales horizontally.</dd></div>
+          <div class="row"><dt>"What if two people take the last seat?"</dt><dd>Today it's one transaction, and SQLite has a single writer, so it holds. On Postgres you'd add <code>SELECT … FOR UPDATE</code> — three lines. <b>Know this one; it's the sharpest question they can ask.</b></dd></div>
+          <div class="row"><dt>"Is JWT in localStorage safe?"</dt><dd>It's vulnerable to XSS. Production would use httpOnly cookies. For a campus MVP with no untrusted user-generated HTML, it's an accepted trade-off.</dd></div>
+          <div class="row"><dt>"How do you know it works?"</dt><dd>A smoke test mounts every route against the live API and fails on any crash or missing content.</dd></div>
+        </div>
+
+        <div class="note weak">
+          <h4>Weaknesses to own before they're found</h4>
+          <p>
+            No rate limiting on login. No email verification — the domain check trusts the address.
+            No edit or cancel for rides. <code>SECRET_KEY</code> is committed in
+            <code>config.py</code> and would need to move to an environment variable. Naming each of
+            these before a judge does turns a weakness into evidence that you understand your own
+            system.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════ 12 ══════════════ -->
+      <section id="ten">
+        <div class="sec-no">Section twelve</div>
+        <h2>The ten things to know cold</h2>
+        <p class="lede">
+          If you only rehearse one section, rehearse this one. Each has a line you can actually say.
+        </p>
+
+        <ol class="ten">
+          <li>
+            <h3>The three-layer round trip</h3>
+            <p>Browser → <code>api.js</code> attaches the token → FastAPI validates → token identifies you → SQLAlchemy queries SQLite → rows serialised to JSON → React re-renders.</p>
+            <p class="say">"Every action in the app follows the same seven steps."</p>
+          </li>
+          <li>
+            <h3>The scoring formula</h3>
+            <p>45 time, 20 destination, 15 pickup, 12 seats, 8 luggage — summing to 100. Memorise these five numbers.</p>
+            <p class="say">"We don't filter rides, we score them out of 100 and rank them."</p>
+          </li>
+          <li>
+            <h3>Three match types from one engine</h3>
+            <p><code>join_car</code>, <code>group_up</code>, <code>give_seat</code> — decided by <code>classify()</code> in <code>matching.py</code>.</p>
+            <p class="say">"Other apps match riders to drivers. We also match riders to each other."</p>
+          </li>
+          <li>
+            <h3>The creator comes from the token</h3>
+            <p><code>user_id=user.id</code> in <code>create_ride</code> — never from the request body.</p>
+            <p class="say">"The browser can lie about anything, so identity always comes from the signed token."</p>
+          </li>
+          <li>
+            <h3>Passwords are hashed, never stored</h3>
+            <p>PBKDF2-SHA256, 120,000 iterations, random per-user salt, constant-time comparison.</p>
+            <p class="say">"Even with the database file, you can't recover anyone's password."</p>
+          </li>
+          <li>
+            <h3>Why <code>ride_joins</code> is its own table</h3>
+            <p>Many-to-many: one ride, many passengers; one student, many rides. Unique constraint on the pair.</p>
+            <p class="say">"A passengers column would have broken the moment a second person joined."</p>
+          </li>
+          <li>
+            <h3>Time stored as minutes since midnight</h3>
+            <p><code>"17:00"</code> for display, <code>1020</code> for maths.</p>
+            <p class="say">"Comparing departure times is integer arithmetic, so the window check is trivial and fast."</p>
+          </li>
+          <li>
+            <h3>Joining is one transaction</h3>
+            <p>Insert the join row and decrement the seat together; commit once.</p>
+            <p class="say">"A seat can never be sold twice or go negative — it's all-or-nothing."</p>
+          </li>
+          <li>
+            <h3>Privacy is enforced at serialisation</h3>
+            <p><code>_rider_out()</code> returns <code>phone=None</code> unless you're on the ride and sharing is on.</p>
+            <p class="say">"The number isn't hidden in the UI — the API never sends it."</p>
+          </li>
+          <li>
+            <h3>The measured performance story</h3>
+            <p>20,000 rides: matching 24 ms. Found and fixed an N+1 (110 → 3 queries) and an O(n) landing page (3,813 ms → 57 ms).</p>
+            <p class="say">"We profiled it, found two bottlenecks, and fixed both — here are the numbers."</p>
+          </li>
+        </ol>
+      </section>
+
+      <footer>
+        <span>RidePair · engineering brief</span>
+        <span>FastAPI · SQLAlchemy · SQLite · React 19 · Vite · Tailwind 4</span>
+        <span>All references point to real files and line numbers</span>
+      </footer>
+
+    </main>
+  </div>
+</div>

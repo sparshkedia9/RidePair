@@ -1,0 +1,8 @@
+ridepair.db
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+static_react/
+frontend/ssr-out/
+.smoke_env.json
